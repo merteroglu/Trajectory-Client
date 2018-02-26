@@ -18,6 +18,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.nbsp.materialfilepicker.MaterialFilePicker;
 import com.nbsp.materialfilepicker.ui.FilePickerActivity;
 
@@ -28,7 +31,15 @@ import java.io.IOException;
 import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
+
+    private String API_URL = "https://localhost:8080/";
+
+    private GoogleMap mMap;
+
+    private Services services;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +61,19 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+
+        services = RetrofitClient.getClient(API_URL).create(Services.class);
+
+
+        MapFragment mapFragment = (MapFragment) getFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+
+
+
+
+
     }
 
     @Override
@@ -119,6 +143,11 @@ public class MainActivity extends AppCompatActivity
 
 
         }
+
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
 
     }
 }

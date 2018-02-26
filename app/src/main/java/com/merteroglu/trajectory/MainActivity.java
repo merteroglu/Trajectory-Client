@@ -21,6 +21,10 @@ import android.view.MenuItem;
 import com.nbsp.materialfilepicker.MaterialFilePicker;
 import com.nbsp.materialfilepicker.ui.FilePickerActivity;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity
@@ -91,6 +95,29 @@ public class MainActivity extends AppCompatActivity
             String filePath = data.getStringExtra(FilePickerActivity.RESULT_FILE_PATH);
             // Do anything with file
             Log.d("MainActivity", "onActivityResult: filePath : " + filePath);
+            File file = new File(filePath);
+
+            if(file.exists()){
+                StringBuilder text = new StringBuilder();
+
+                try{
+                    BufferedReader br = new BufferedReader(new FileReader(file));
+                    String line;
+
+                    while((line = br.readLine()) != null){
+                        text.append(line);
+                        text.append('\n');
+                    }
+
+                }catch (IOException e){
+
+                }
+
+                Log.d("Main", "text : \n" + text);
+
+            }
+
+
         }
 
     }

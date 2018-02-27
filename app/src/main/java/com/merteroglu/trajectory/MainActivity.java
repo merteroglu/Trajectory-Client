@@ -28,6 +28,8 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.merteroglu.trajectory.Model.Coordinate;
 import com.merteroglu.trajectory.Model.Coordinates;
+import com.merteroglu.trajectory.Model.ReducedResponse;
+import com.merteroglu.trajectory.Model.SearchingBody;
 import com.nbsp.materialfilepicker.MaterialFilePicker;
 import com.nbsp.materialfilepicker.ui.FilePickerActivity;
 
@@ -38,6 +40,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
 
@@ -46,6 +52,8 @@ public class MainActivity extends AppCompatActivity
     private Services services;
     private String filePath = "";
     private ArrayList<Coordinate> coordinateList;
+    private ReducedResponse reducedResponse;
+    private Coordinates foundCoordinates;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,6 +148,8 @@ public class MainActivity extends AppCompatActivity
 
                 }
 
+                drawCoordinates(coordinateList);
+
             }
 
 
@@ -176,5 +186,46 @@ public class MainActivity extends AppCompatActivity
         }
 
     }
+
+    public void reduceCoordinates(){
+
+        Coordinates coordinates = new Coordinates();
+        coordinates.setCoordinates(coordinateList);
+
+        services.reduceCoordinates(coordinates).enqueue(new Callback<ReducedResponse>() {
+            @Override
+            public void onResponse(Call<ReducedResponse> call, Response<ReducedResponse> response) {
+                reducedResponse = response.body();
+            }
+
+            @Override
+            public void onFailure(Call<ReducedResponse> call, Throwable t) {
+
+            }
+        });
+
+    }
+
+    public void searchCoordinates(Coordinate topLeft , Coordinate bottomRight){
+
+        SearchingBody searchingBody = new SearchingBody();
+        searchingBody.setAllCoordinates(coordinateList);
+        searchingBody.setTopLeft(topLeft);
+        searchingBody.setBottomRight(bottomRight);
+
+        services.searchCoordinates(searchingBody).enqueue(new Callback<Coordinates>() {
+            @Override
+            public void onResponse(Call<Coordinates> call, Response<Coordinates> response) {
+                foundCoordinates = response.body();
+            }
+
+            @Override
+            public void onFailure(Call<Coordinates> call, Throwable t) {
+
+            }
+        });
+
+    }
+
 
 }

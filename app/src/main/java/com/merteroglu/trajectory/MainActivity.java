@@ -173,8 +173,6 @@ public class MainActivity extends AppCompatActivity
                     .width(5f)
                     .color(Color.BLACK));
 
-
-
         }
 
     }

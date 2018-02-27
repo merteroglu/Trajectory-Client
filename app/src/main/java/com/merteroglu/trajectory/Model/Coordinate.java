@@ -4,7 +4,7 @@ package com.merteroglu.trajectory.Model;
  * Created by Mert on 26.02.2018.
  */
 
-class Coordinate {
+public class Coordinate {
     private double longitude; // boylam x
     private double latitude; // enlem y
 

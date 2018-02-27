@@ -3,6 +3,7 @@ package com.merteroglu.trajectory;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -21,6 +22,12 @@ import android.view.MenuItem;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
+import com.merteroglu.trajectory.Model.Coordinate;
+import com.merteroglu.trajectory.Model.Coordinates;
 import com.nbsp.materialfilepicker.MaterialFilePicker;
 import com.nbsp.materialfilepicker.ui.FilePickerActivity;
 
@@ -28,18 +35,17 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
 
     private String API_URL = "https://localhost:8080/";
-
     private GoogleMap mMap;
-
     private Services services;
-
-
+    private String filePath = "";
+    private ArrayList<Coordinate> coordinateList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +58,6 @@ public class MainActivity extends AppCompatActivity
             requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_EXTERNAL_STORAGE},1001);
         }
 
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -62,14 +67,14 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-
         services = RetrofitClient.getClient(API_URL).create(Services.class);
+
+        coordinateList = new ArrayList<>();
 
 
         MapFragment mapFragment = (MapFragment) getFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
 
 
 
@@ -116,28 +121,24 @@ public class MainActivity extends AppCompatActivity
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == 1 && resultCode == RESULT_OK) {
-            String filePath = data.getStringExtra(FilePickerActivity.RESULT_FILE_PATH);
-            // Do anything with file
-            Log.d("MainActivity", "onActivityResult: filePath : " + filePath);
+            filePath = data.getStringExtra(FilePickerActivity.RESULT_FILE_PATH);
+
             File file = new File(filePath);
 
             if(file.exists()){
-                StringBuilder text = new StringBuilder();
 
                 try{
                     BufferedReader br = new BufferedReader(new FileReader(file));
                     String line;
 
                     while((line = br.readLine()) != null){
-                        text.append(line);
-                        text.append('\n');
+                       String[] coor = line.split(".");
+                       coordinateList.add(new Coordinate(Double.parseDouble(coor[0]),Double.parseDouble(coor[1])));
                     }
 
                 }catch (IOException e){
 
                 }
-
-                Log.d("Main", "text : \n" + text);
 
             }
 
@@ -148,6 +149,34 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+    }
+
+    public void drawCoordinates(ArrayList<Coordinate> coordinateList){
+        Double lat,lng,lat2,lng2;
+
+        for(Coordinate c : coordinateList){
+            lat = c.getLatitude();
+            lng = c.getLongitude();
+
+            mMap.addMarker(new MarkerOptions().position(new LatLng(lat,lng)));
+        }
+
+        for (int i = 0; i < coordinateList.size() - 1; i++) {
+            lat = coordinateList.get(i).getLatitude();
+            lng = coordinateList.get(i).getLongitude();
+            lat2 = coordinateList.get(i+1).getLatitude();
+            lng2 = coordinateList.get(i+1).getLongitude();
+
+            Polyline line = mMap.addPolyline(new PolylineOptions()
+                    .add(new LatLng(lat,lng),new LatLng(lat2,lng2))
+                    .width(5f)
+                    .color(Color.BLACK));
+
+
+
+        }
 
     }
+
 }

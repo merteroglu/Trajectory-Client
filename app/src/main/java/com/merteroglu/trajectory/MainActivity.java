@@ -19,9 +19,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
@@ -114,7 +118,7 @@ public class MainActivity extends AppCompatActivity
                     .withHiddenFiles(true) // Show hidden files and folders
                     .start();
         } else if (id == R.id.nav_reduction) {
-
+            reduceCoordinates();
         } else if (id == R.id.nav_search) {
 
         }
@@ -140,7 +144,7 @@ public class MainActivity extends AppCompatActivity
                     String line;
 
                     while((line = br.readLine()) != null){
-                       String[] coor = line.split(".");
+                       String[] coor = line.split(",");
                        coordinateList.add(new Coordinate(Double.parseDouble(coor[0]),Double.parseDouble(coor[1])));
                     }
 
@@ -169,10 +173,12 @@ public class MainActivity extends AppCompatActivity
             lat = c.getLatitude();
             lng = c.getLongitude();
 
-            mMap.addMarker(new MarkerOptions().position(new LatLng(lat,lng)));
+            mMap.addMarker(new MarkerOptions().position(new LatLng(lat,lng)).icon(getMarkerIcon("#ff0000")).title("1"));
         }
 
-        for (int i = 0; i < coordinateList.size() - 1; i++) {
+
+
+        for (int i = 0; i < coordinateList.size() - 2; i++) {
             lat = coordinateList.get(i).getLatitude();
             lng = coordinateList.get(i).getLongitude();
             lat2 = coordinateList.get(i+1).getLatitude();
@@ -184,6 +190,8 @@ public class MainActivity extends AppCompatActivity
                     .color(Color.BLACK));
 
         }
+
+        updateMaps(new LatLng());
 
     }
 
@@ -225,6 +233,20 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+    }
+
+    public void updateMaps(LatLng position){
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(position)
+                .zoom(5f).build();
+        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+    }
+
+    public BitmapDescriptor getMarkerIcon(String color) {
+        float[] hsv = new float[3];
+        Color.colorToHSV(Color.parseColor(color), hsv);
+        return BitmapDescriptorFactory.defaultMarker(hsv[0]);
+        //return BitmapDescriptorFactory.fromResource(R.drawable.marker);
     }
 
 

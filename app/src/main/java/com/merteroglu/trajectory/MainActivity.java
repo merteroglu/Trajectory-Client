@@ -305,6 +305,11 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void searchCoordinates(Coordinate topLeft , Coordinate bottomRight){
+        final SweetAlertDialog mDialog = new SweetAlertDialog(this,SweetAlertDialog.PROGRESS_TYPE);
+        mDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
+        mDialog.setTitleText("Receiving data ...");
+        mDialog.setCancelable(false);
+        mDialog.show();
 
         SearchingBody searchingBody = new SearchingBody();
         searchingBody.setAllCoordinates(coordinateList);
@@ -315,11 +320,28 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onResponse(Call<Coordinates> call, Response<Coordinates> response) {
                 foundCoordinates = response.body();
+
+                mDialog.setTitleText("Successful");
+                mDialog.setContentText("Search successfully");
+                mDialog.setConfirmText("OK");
+                mDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sweetAlertDialog) {
+                        drawCoordinates(foundCoordinates.getCoordinates(),2);
+                    }
+                });
+                mDialog.changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
+                mDialog.setCancelable(true);
+
             }
 
             @Override
             public void onFailure(Call<Coordinates> call, Throwable t) {
-
+                mDialog.setTitleText("Error");
+                mDialog.setContentText("Unable to connect");
+                mDialog.setConfirmText("OK");
+                mDialog.changeAlertType(SweetAlertDialog.ERROR_TYPE);
+                mDialog.setCancelable(true);
             }
         });
 

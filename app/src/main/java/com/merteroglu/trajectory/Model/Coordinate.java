@@ -5,13 +5,13 @@ package com.merteroglu.trajectory.Model;
  */
 
 public class Coordinate {
-    private double longitude; // boylam x
     private double latitude; // enlem y
+    private double longitude; // boylam x
 
     public Coordinate() {
     }
 
-    public Coordinate(double longitude, double latitude) {
+    public Coordinate(double latitude, double longitude) {
         this.longitude = longitude;
         this.latitude = latitude;
     }

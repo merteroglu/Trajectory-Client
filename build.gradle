@@ -22,6 +22,9 @@ allprojects {
         maven {
             url  "http://dl.bintray.com/lukaville/maven"
         }
+        maven {
+            url "https://maven.google.com"
+        }
     }
 }
 

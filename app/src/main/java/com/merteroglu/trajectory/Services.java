@@ -15,10 +15,10 @@ import retrofit2.http.POST;
 public interface Services {
 
 
-    @POST("api/reduction")
+    @POST("reduction")
     Call<ReducedResponse> reduceCoordinates(@Body Coordinates request);
 
-    @POST("api/search")
+    @POST("search")
     Call<Coordinates> searchCoordinates(@Body SearchingBody request);
 
 }

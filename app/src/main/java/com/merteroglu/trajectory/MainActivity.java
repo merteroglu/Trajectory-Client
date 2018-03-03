@@ -51,7 +51,7 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
 
-    private String API_URL = "https://localhost:8080/";
+    private String API_URL = "https://localhost:8080/api/";
     private GoogleMap mMap;
     private Services services;
     private String filePath = "";
@@ -66,8 +66,13 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ){
-            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_EXTERNAL_STORAGE},1001);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+                && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+                && checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.ACCESS_FINE_LOCATION},1001);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -173,25 +178,23 @@ public class MainActivity extends AppCompatActivity
             lat = c.getLatitude();
             lng = c.getLongitude();
 
-            mMap.addMarker(new MarkerOptions().position(new LatLng(lat,lng)).icon(getMarkerIcon("#ff0000")).title("1"));
+            mMap.addMarker(new MarkerOptions().position(new LatLng(lat,lng)));
         }
 
-
-
-        for (int i = 0; i < coordinateList.size() - 2; i++) {
+        for (int i = 0; i < coordinateList.size() - 1; i++) {
             lat = coordinateList.get(i).getLatitude();
             lng = coordinateList.get(i).getLongitude();
             lat2 = coordinateList.get(i+1).getLatitude();
             lng2 = coordinateList.get(i+1).getLongitude();
 
-            Polyline line = mMap.addPolyline(new PolylineOptions()
+              mMap.addPolyline(new PolylineOptions()
                     .add(new LatLng(lat,lng),new LatLng(lat2,lng2))
-                    .width(5f)
-                    .color(Color.BLACK));
+                    .width(7f)
+                    .color(Color.RED));
 
         }
 
-        updateMaps(new LatLng());
+        updateMaps(new LatLng(coordinateList.get(coordinateList.size()-1).getLatitude(),coordinateList.get(coordinateList.size()-1).getLongitude()));
 
     }
 
@@ -238,15 +241,8 @@ public class MainActivity extends AppCompatActivity
     public void updateMaps(LatLng position){
         CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(position)
-                .zoom(5f).build();
+                .zoom(15f).build();
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-    }
-
-    public BitmapDescriptor getMarkerIcon(String color) {
-        float[] hsv = new float[3];
-        Color.colorToHSV(Color.parseColor(color), hsv);
-        return BitmapDescriptorFactory.defaultMarker(hsv[0]);
-        //return BitmapDescriptorFactory.fromResource(R.drawable.marker);
     }
 
 

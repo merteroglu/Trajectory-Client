@@ -53,7 +53,8 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
 
-    private String API_URL = "https://localhost:8080/api/";
+    //private String API_URL = "https://localhost:8080/api/";
+    private String API_URL = "http://10.0.2.2:8080/api/";
     private GoogleMap mMap;
     private Services services;
     private String filePath = "";
@@ -279,11 +280,12 @@ public class MainActivity extends AppCompatActivity
                 reducedResponse = response.body();
 
                 mDialog.setTitleText("Successful");
-                mDialog.setContentText("Response Time :" + reducedResponse.getResponseTime() + "\n Rate :" + reducedResponse.getReducedRate());
+                mDialog.setContentText("Response Time :" + reducedResponse.getResponseTime() + " ms" + "\n Rate : %" + reducedResponse.getReducedRate());
                 mDialog.setConfirmText("OK");
                 mDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                     @Override
                     public void onClick(SweetAlertDialog sweetAlertDialog) {
+                        mDialog.dismiss();
                         drawCoordinates(reducedResponse.getReducedCoordinates(),1);
                     }
                 });
@@ -327,6 +329,7 @@ public class MainActivity extends AppCompatActivity
                 mDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                     @Override
                     public void onClick(SweetAlertDialog sweetAlertDialog) {
+                        mDialog.dismiss();
                         drawCoordinates(foundCoordinates.getCoordinates(),2);
                     }
                 });

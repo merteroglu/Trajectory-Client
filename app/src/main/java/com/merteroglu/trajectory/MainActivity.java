@@ -18,6 +18,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -36,6 +37,7 @@ import com.merteroglu.trajectory.Model.ReducedResponse;
 import com.merteroglu.trajectory.Model.SearchingBody;
 import com.nbsp.materialfilepicker.MaterialFilePicker;
 import com.nbsp.materialfilepicker.ui.FilePickerActivity;
+import com.ontbee.legacyforks.cn.pedant.SweetAlert.SweetAlertDialog;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -58,6 +60,11 @@ public class MainActivity extends AppCompatActivity
     private ArrayList<Coordinate> coordinateList;
     private ReducedResponse reducedResponse;
     private Coordinates foundCoordinates;
+    private boolean searching = false;
+    private Coordinate sRectTopLeft;
+    private Coordinate sRectBottomRight;
+    int sRect = 0;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,8 +101,6 @@ public class MainActivity extends AppCompatActivity
         mapFragment.getMapAsync(this);
 
 
-
-
     }
 
     @Override
@@ -123,9 +128,18 @@ public class MainActivity extends AppCompatActivity
                     .withHiddenFiles(true) // Show hidden files and folders
                     .start();
         } else if (id == R.id.nav_reduction) {
-            reduceCoordinates();
+            if(coordinateList.size() > 0){
+                reduceCoordinates();
+            }else {
+                Toast.makeText(this, "First load the coordinates", Toast.LENGTH_SHORT).show();
+            }
         } else if (id == R.id.nav_search) {
-
+            if(coordinateList.size() > 0){
+                searching = true;
+                Toast.makeText(this, "Please Select Top Left Corner", Toast.LENGTH_SHORT).show();
+            }else{
+                Toast.makeText(this, "First load the coordinates", Toast.LENGTH_SHORT).show();
+            }
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -157,7 +171,7 @@ public class MainActivity extends AppCompatActivity
 
                 }
 
-                drawCoordinates(coordinateList);
+                drawCoordinates(coordinateList,0    );
 
             }
 
@@ -169,16 +183,67 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                if(searching){
+                    if(sRect == 0){
+                        sRectTopLeft = new Coordinate(latLng.latitude,latLng.longitude);
+                        Toast.makeText(MainActivity.this, "Please Select Bottom Right Corner", Toast.LENGTH_SHORT).show();
+                        sRect++;
+                    }else if(sRect == 1){
+                        sRectBottomRight = new Coordinate(latLng.latitude,latLng.longitude);
+                        sRect = 0;
+                        searching = false;
+                        drawSRect();
+                        searchCoordinates(sRectTopLeft,sRectBottomRight);
+                    }
+                }
+            }
+        });
+
     }
 
-    public void drawCoordinates(ArrayList<Coordinate> coordinateList){
+    public void drawSRect(){
+        PolylineOptions rectOptions = new PolylineOptions()
+                .add(new LatLng(sRectTopLeft.getLatitude(), sRectBottomRight.getLongitude()))
+                .add(new LatLng(sRectBottomRight.getLatitude(), sRectBottomRight.getLongitude()))
+                .add(new LatLng(sRectBottomRight.getLatitude(), sRectTopLeft.getLongitude()))
+                .add(new LatLng(sRectTopLeft.getLatitude(), sRectTopLeft.getLongitude()))
+                .add(new LatLng(sRectTopLeft.getLatitude(), sRectBottomRight.getLongitude()));
+
+        rectOptions.color(Color.YELLOW);
+
+        mMap.addPolyline(rectOptions);
+    }
+
+
+    public void drawCoordinates(ArrayList<Coordinate> coordinateList,int type){
         Double lat,lng,lat2,lng2;
 
         for(Coordinate c : coordinateList){
             lat = c.getLatitude();
             lng = c.getLongitude();
 
-            mMap.addMarker(new MarkerOptions().position(new LatLng(lat,lng)));
+            if(type == 0){
+                mMap.addMarker(new MarkerOptions().position(new LatLng(lat,lng)));
+            }else if(type == 1){
+                mMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)).position(new LatLng(lat,lng)));
+            }else if(type == 2){
+                mMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE)).position(new LatLng(lat,lng)));
+            }
+
+        }
+
+        int color = Color.RED;
+
+        if(type == 0){
+            color = Color.RED;
+        }else if(type == 1){
+            color = Color.GREEN;
+        }else if(type == 2){
+            color = Color.MAGENTA;
         }
 
         for (int i = 0; i < coordinateList.size() - 1; i++) {
@@ -190,7 +255,7 @@ public class MainActivity extends AppCompatActivity
               mMap.addPolyline(new PolylineOptions()
                     .add(new LatLng(lat,lng),new LatLng(lat2,lng2))
                     .width(7f)
-                    .color(Color.RED));
+                    .color(color));
 
         }
 
@@ -199,6 +264,11 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void reduceCoordinates(){
+        final SweetAlertDialog mDialog = new SweetAlertDialog(this,SweetAlertDialog.PROGRESS_TYPE);
+        mDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
+        mDialog.setTitleText("Receiving data ...");
+        mDialog.setCancelable(false);
+        mDialog.show();
 
         Coordinates coordinates = new Coordinates();
         coordinates.setCoordinates(coordinateList);
@@ -207,11 +277,28 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onResponse(Call<ReducedResponse> call, Response<ReducedResponse> response) {
                 reducedResponse = response.body();
+
+                mDialog.setTitleText("Successful");
+                mDialog.setContentText("Response Time :" + reducedResponse.getResponseTime() + "\n Rate :" + reducedResponse.getReducedRate());
+                mDialog.setConfirmText("OK");
+                mDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sweetAlertDialog) {
+                        drawCoordinates(reducedResponse.getReducedCoordinates(),1);
+                    }
+                });
+                mDialog.changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
+                mDialog.setCancelable(true);
+
             }
 
             @Override
             public void onFailure(Call<ReducedResponse> call, Throwable t) {
-
+                mDialog.setTitleText("Error");
+                mDialog.setContentText("Unable to connect");
+                mDialog.setConfirmText("OK");
+                mDialog.changeAlertType(SweetAlertDialog.ERROR_TYPE);
+                mDialog.setCancelable(true);
             }
         });
 

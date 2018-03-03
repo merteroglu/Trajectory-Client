@@ -1,5 +1,6 @@
 package com.merteroglu.trajectory.Model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -7,24 +8,24 @@ import java.util.List;
  */
 
 public class ReducedResponse {
-    List<Coordinate> reducedCoordinates;
+    ArrayList<Coordinate> reducedCoordinates;
     double reducedRate;
     long responseTime;
 
     public ReducedResponse() {
     }
 
-    public ReducedResponse(List<Coordinate> reducedCoordinates, double reducedRate, long responseTime) {
+    public ReducedResponse(ArrayList<Coordinate> reducedCoordinates, double reducedRate, long responseTime) {
         this.reducedCoordinates = reducedCoordinates;
         this.reducedRate = reducedRate;
         this.responseTime = responseTime;
     }
 
-    public List<Coordinate> getReducedCoordinates() {
+    public ArrayList<Coordinate> getReducedCoordinates() {
         return reducedCoordinates;
     }
 
-    public void setReducedCoordinates(List<Coordinate> reducedCoordinates) {
+    public void setReducedCoordinates(ArrayList<Coordinate> reducedCoordinates) {
         this.reducedCoordinates = reducedCoordinates;
     }
 

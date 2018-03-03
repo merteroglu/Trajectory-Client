@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity
     private ReducedResponse reducedResponse;
     private Coordinates foundCoordinates;
     private boolean searching = false;
+    private int searchType = 0;
     private Coordinate sRectTopLeft;
     private Coordinate sRectBottomRight;
     int sRect = 0;
@@ -95,6 +96,7 @@ public class MainActivity extends AppCompatActivity
         services = RetrofitClient.getClient(API_URL).create(Services.class);
 
         coordinateList = new ArrayList<>();
+        reducedResponse = new ReducedResponse();
 
 
         MapFragment mapFragment = (MapFragment) getFragmentManager()
@@ -129,18 +131,50 @@ public class MainActivity extends AppCompatActivity
                     .withHiddenFiles(true) // Show hidden files and folders
                     .start();
         } else if (id == R.id.nav_reduction) {
+
             if(coordinateList.size() > 0){
                 reduceCoordinates();
             }else {
-                Toast.makeText(this, "First load the coordinates", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "First load the coordinates", Toast.LENGTH_SHORT).show();
             }
+
         } else if (id == R.id.nav_search) {
-            if(coordinateList.size() > 0){
-                searching = true;
-                Toast.makeText(this, "Please Select Top Left Corner", Toast.LENGTH_SHORT).show();
-            }else{
-                Toast.makeText(this, "First load the coordinates", Toast.LENGTH_SHORT).show();
-            }
+            final SweetAlertDialog mDialog = new SweetAlertDialog(this,SweetAlertDialog.NORMAL_TYPE);
+            mDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
+            mDialog.setTitleText("Which is searched in ?");
+            mDialog.setCancelable(true);
+            mDialog.setConfirmText("All Data");
+            mDialog.setCancelText("Reduced Data");
+            mDialog.show();
+            mDialog.showCancelButton(true);
+
+            mDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                @Override
+                public void onClick(SweetAlertDialog sweetAlertDialog) {
+                    if(coordinateList.size() > 0){
+                        mDialog.dismiss();
+                        searching = true;
+                        Toast.makeText(MainActivity.this, "Please Select Top Left Corner", Toast.LENGTH_SHORT).show();
+                    }else {
+                        Toast.makeText(MainActivity.this, "First load the coordinates", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+
+            mDialog.setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                @Override
+                public void onClick(SweetAlertDialog sweetAlertDialog) {
+                    if(reducedResponse.getReducedCoordinates().size() > 0){
+                        mDialog.dismiss();
+                        searching = true;
+                        Toast.makeText(MainActivity.this, "Please Select Top Left Corner", Toast.LENGTH_SHORT).show();
+                    }else {
+                        Toast.makeText(MainActivity.this, "First reduce the coordinates", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+
+
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

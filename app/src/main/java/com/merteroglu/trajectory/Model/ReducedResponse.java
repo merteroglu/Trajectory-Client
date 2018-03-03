@@ -13,6 +13,9 @@ public class ReducedResponse {
     long responseTime;
 
     public ReducedResponse() {
+        reducedCoordinates = new ArrayList<>();
+        reducedRate = 0;
+        responseTime = 0;
     }
 
     public ReducedResponse(ArrayList<Coordinate> reducedCoordinates, double reducedRate, long responseTime) {

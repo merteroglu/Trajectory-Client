@@ -1,0 +1,45 @@
+= Trajectory-Client
+
+== Server Repo
+
+link:https://github.com/merteroglu/Trajectory-Server[Trajectory Server]
+
+== About
+
+This project has three functions. They are in the left menu. The import function reads coordinate data sets from text files and print these coordinates to google maps. The Reduction function sends all coordinate data to server and waits response. When the response came prints new coordinates to google maps. The new coordinates' colors are green. The Search function sends data which is chosen by user - all coordinates or reduced coordinates list - and top left and bottom right coordinates of rectangle  to server and  waits response. When the response came prints new coordinates and draws the searching rectangle to google maps. The found coordinates' colors are rose.The searching rectangle's color is yellow.
+
+
+image::https://media.giphy.com/media/6bddB9R9rQYstta2SO/giphy.gif[]
+
+== Credits
+
+Author : Mert Eroglu
+
+[link=https://github.com/merteroglu]
+image::https://asciidoctor.org/images/octocat.jpg[Github Profile]
+[link=https://twitter.com/16PaxweL]
+image::http://www.merayarnett.com/wp-content/uploads/2017/12/Cool-Twitter-Logo-Vector-Free-28-With-Additional-Design-Logo-with-Twitter-Logo-Vector-Free.jpg[Twitter Profile,50,50]
+[link=https://www.linkedin.com/in/mert-eroglu/]
+image::https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png[Twitter Profile,50,50]
+
+
+
+== License
+
+----
+
+Copyright 2017 merteroglu, Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+----

@@ -18,7 +18,7 @@ Author : Mert Eroglu
 [link=https://github.com/merteroglu]
 image::https://asciidoctor.org/images/octocat.jpg[Github Profile]
 [link=https://twitter.com/16PaxweL]
-image::http://www.merayarnett.com/wp-content/uploads/2017/12/Cool-Twitter-Logo-Vector-Free-28-With-Additional-Design-Logo-with-Twitter-Logo-Vector-Free.jpg[Twitter Profile,50,50]
+image::http://logovector.net/wp-content/uploads/2014/08/Twitter-2012-Positive-logo.png[Twitter Profile,50,50]
 [link=https://www.linkedin.com/in/mert-eroglu/]
 image::https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png[Twitter Profile,50,50]
 
